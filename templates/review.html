@@ -1,0 +1,90 @@
+{% extends "layout.html" %}
+{% block body %}
+<!-- 复习页. -->
+
+
+<!--<li>-->
+<!--    <span>{{ card.front }}</span>-->
+<!--    <span>{{ card.back }}</span>-->
+<!--    <span>{{ card.known }}</span>-->
+<!--    <span>{{ card.created }}</span>-->
+<!--</li>-->
+
+<div class="row memorizePanel">
+
+    <div class="col-xs-8 col-xs-offset-2">
+        <div class="panel panel-default cardFront">
+            <div class="panel-body">
+                <div class="alignContainer">
+                    <div class="alignMiddle frontText">
+                        <h3 class="text-center">{{ card.front }}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="panel panel-primary cardBack">
+            <div class="panel-body">
+                <div class="alignContainer">
+                    <div class="alignMiddle frontText">
+                        <div class="text-center largerText">
+                            <div id="d1"></div>
+                            <div id="d2" style="display:none">
+                                {{ card.back }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--
+    <div class="col-xs-2">
+        <div class="alignContainer">
+            <div class="alignMiddle text-left">
+                <br/>
+                <br/>
+                <a href="ergergerge"><i class="fa fa-chevron-right fa-5x"></i></a>
+            </div>
+        </div>
+    </div>
+    -->
+</div>
+
+<div class="row">
+    <div class="col-xs-12 text-center">
+        <a href="javascript:" id="flip_over"
+           class="btn btn-primary btn-lg flipCard">
+            <i class="fa fa-exchange"></i>
+            Show Back
+        </a>
+        &nbsp;
+        &nbsp;
+        <a href="{{ url_for('.mark_known', card_id=card.id) }}"
+           class="btn btn-success btn-lg">
+            <i class="fa fa-check"></i>
+            I Know It
+        </a>
+        &nbsp;
+        &nbsp;
+        <a href="{{ url_for('.review') }}" class="btn btn-primary btn-lg">
+            Next Card
+            <i class="fa fa-arrow-right"></i>
+        </a>
+    </div>
+</div>
+<div class="row">
+    <div class="col-xs-12 text-center">
+        <br/>
+        <br/>
+        <br/>
+        <a href="urlfor(card_type, card_id=card.id)"
+           class="btn btn-default btn-sm">
+            <i class="fa fa-bookmark"></i>
+            bookmark this card (#{{ card.id }})
+        </a>
+
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/flip_over.js') }}"></script>
+{% endblock %}

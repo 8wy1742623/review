@@ -1,0 +1,57 @@
+<!doctype html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet"
+          href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"
+          integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7"
+          crossorigin="anonymous">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="https://code.jquery.com/jquery-2.2.4.min.js"
+            integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+<!--    <script src="https://use.fontawesome.com/8cea844162.js"></script>-->
+<!--    <script src="{{ url_for('static', filename='fastclick.min.js') }}"></script>-->
+    <script src="{{ url_for('static', filename='js/utils.js') }}"></script>
+    <title>Review Application</title>
+    <style>
+        .p {
+            background: #dddddd
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="row">
+        <div class="col-xs-12">
+
+            <br/>
+            <nav class="navbar navbar-default">
+                <div class="navbar-header">
+                    <a class="navbar-brand" href="{{ url_for('.index') }}">Flash Cards</a>
+
+                    <ul class="nav navbar-nav navbar-right">
+                        <li><a href="{{ url_for('.list_cards') }}">cards</a></li>
+                        <li>&nbsp;&nbsp;&nbsp;&nbsp;</li>
+                    </ul>
+                </div>
+            </nav>
+
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    <ul class='alert alert-succes flashes' role="alert">
+                        {% for message in messages %}
+                        <li>{{ message }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            {% endwith %}
+
+            {% block body %}{% endblock %}
+        </div>
+    </div>
+</div>
+
+
+</body>
+</html>

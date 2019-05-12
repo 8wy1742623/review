@@ -1,0 +1,7 @@
+{% extends "layout.html" %}
+{% block body %}
+<div><a href="{{ url_for('.new_card') }}">录入卡片</a></div>
+<div><a href="{{ url_for('.list_cards') }}">列出所有卡片</a></div>
+<div><a href="{{ url_for('.list_today_cards') }}">列出今天复习计划中的卡片</a></div>
+<div><a href="{{ url_for('.review') }}">开始复习</a></div>
+{% endblock %}

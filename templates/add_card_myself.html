@@ -1,0 +1,115 @@
+{% extends "layout.html" %}
+{% block body %}
+
+<!--<form method="post" action="{{ url_for('.add_card') }}">-->
+<!--    <div>-->
+<!--        <p>日期</p>-->
+<!--        <p id="show_date">Jan 01 2019 # 这里显示当天日期</p>-->
+<!--    </div>-->
+<!--    <div>-->
+<!--&lt;!&ndash; todo 类型是可选项， 默认是‘vocabulary’ &ndash;&gt;-->
+<!--        <p>类型</p>-->
+<!--        <textarea name="type" id="type" cols="30" rows="2"></textarea>-->
+<!--    </div>-->
+<!--    <div>-->
+<!--        <p>前</p>-->
+<!--        <textarea name="front" id="front" cols="30" rows="2"></textarea>-->
+<!--    </div>-->
+<!--    <div>-->
+<!--        <p>后</p>-->
+<!--        <textarea name="back" id="back" cols="30" rows="10"></textarea>-->
+<!--    </div>-->
+<!--    <div>-->
+<!--        <p>加入复习计划</p>-->
+<!--        &lt;!&ndash; radio 是单选按钮 &ndash;&gt;-->
+<!--        <input type="radio" name="in_plan" value="1">是-->
+<!--        <br>-->
+<!--        <input type="radio" name="in_plan" value="0" checked>否-->
+<!--    </div>-->
+<!--    <input type="submit" id="submit" data-loading-text="提交中" value="提交">-->
+<!--</form>-->
+
+<div class="well editPanel">
+    <h2>Add a Card</h2>
+    <div>
+        <p>日期</p>
+        <p id="show_date">Jan 01 2019 # 这里显示当天日期</p>
+    </div>
+    <form action="{{ url_for('.add_card') }}" method="post" class="cardForm">
+        <div class="form-group">
+            <label for="vocabulary" class="toggleButton btn btn-default btn-lg">General &nbsp;
+                <input type="radio" name="type" value="vocabulary" id="vocabulary"/>
+            </label>
+<!--            <label for="code" class="toggleButton btn btn-default btn-lg">Code &nbsp;-->
+<!--                <input type="radio" name="type" value="2" id="code"/>-->
+<!--            </label>-->
+        </div>
+        <div class="form-group fieldFront">
+            <label for="front">Front of Card</label>
+            <input type="text" name="front" id="front" class="form-control">
+        </div>
+        <div class="form-group fieldBack">
+            <label for="back">Back of Card</label>
+            <textarea name="back"
+                      class="form-control"
+                      id="back"
+                      placeholder="back of card"
+                      rows="12"></textarea>
+        </div>
+        <!-- .fieldInPlan -->
+        <div class="form-group">
+            <p>加入复习计划</p>
+            <!-- radio 是单选按钮 -->
+            <input type="radio" name="in_plan" value="1">是
+            <br>
+            <input type="radio" name="in_plan" value="0" checked>否
+        </div>
+        <div class="form-group">
+            <button type="submit" class="saveButton btn btn-lg btn-primary">Save</button>
+        </div>
+    </form>
+</div>
+
+<div class="page-header">
+    <h2>{{ cards|length }} Card{{ '' if (cards|length == 1) else 's' }}</h2>
+</div>
+<div class="btn-group btn-group-md" role="group" aria-label="filters">
+    <a href="{{ url_for('filter_cards', filter_name="all") }}" class="btn btn-{{ "primary" if filter_name == "all" else "default" }}">All</a>
+    <a href="{{ url_for('filter_cards', filter_name="general") }}" class="btn btn-{{ "primary" if filter_name == "general" else "default" }}">General</a>
+    <a href="{{ url_for('filter_cards', filter_name="code") }}" class="btn btn-{{ "primary" if filter_name == "code" else "default" }}">Code</a>
+    <a href="{{ url_for('filter_cards', filter_name="known") }}" class="btn btn-{{ "primary" if filter_name == "known" else "default" }}">Known</a>
+    <a href="{{ url_for('filter_cards', filter_name="unknown") }}" class="btn btn-{{ "primary" if filter_name == "unknown" else "default" }}">Unknown</a>
+</div>
+
+<br />
+<br />
+
+<table class="table table-bordered">
+    {% for card in cards %}
+    <tr>
+        <td>
+            <a href="{{ url_for('edit', card_id=card.id) }}" class="btn btn-xs btn-primary"><i class="fa fa-pencil" aria-hidden="true"></i></a>
+        </td>
+        <td class="cardContent">
+            <h4>
+                {{ card.front }}
+            </h4>
+            {% if card.type == 1 %}
+            {{ card.back|replace("\n", "<br />")|safe }}
+            {% else %}
+            <pre><code>{{ card.back|escape }}</code></pre>
+            {% endif %}
+        </td>
+    </tr>
+    {% else %}
+    <tr>
+        <td>
+            <em>No cards to show.</em>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+
+<script src="{{ url_for('static', filename='js/add_card.js') }}"></script>
+
+{% endblock %}

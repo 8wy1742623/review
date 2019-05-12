@@ -1,0 +1,12 @@
+{% extends "layout.html" %}
+{% block body %}
+{% for c in cs %}
+<li>
+    <p>{{ c.type }}</p>
+    <span>{{ c.front }}</span>
+    <span>{{ c.back }}</span>
+    <span>{{ c.known }}</span>
+    <span>{{ c.created }}</span>
+</li>
+{% endfor %}
+{% endblock %}
