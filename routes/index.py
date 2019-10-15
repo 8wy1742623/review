@@ -41,12 +41,14 @@ main = Blueprint('index', __name__)
 # You can rerun it to pave the database and start over
 @main.route('/init_db')
 def init_database():
+    log('调用路由')
     init_db()
     return 'Initialized the database.'
 
 
 @main.route("/")
 def index():
+    log('调用路由')
     # todo user
     # if session.get('logged_in'):
     #     return render_template("index.html")
@@ -58,16 +60,19 @@ def index():
 
 @main.route("/new")
 def new_card():
+    log('调用路由')
     log('GET /new.')
     return render_template("add_card.html")
 
 
+# 转换[] 运行[]
 @main.route("/add", methods=['POST'])
 def add_card():
+    log('调用路由')
     form = request.form
     # todo 用户判断
     # u = current_user()
-    log(f'Card.__fields__: {Card.__fields__}')
+    log(f'Card: {Card}')
     card_id = Card.new(form)
     plan = Plan()
     plan.insert_id(card_id)
@@ -76,6 +81,7 @@ def add_card():
 
 @main.route("/cards")
 def list_cards():
+    log('调用路由')
     cs = Card.all()
     # for test
     # cs 是什么
@@ -89,6 +95,7 @@ def list_cards():
 
 @main.route("/list_today_cards")
 def list_today_cards():
+    log('调用路由')
     cs = get_plan()
     if not cs:
         flash('没有一张卡片。')
@@ -98,6 +105,7 @@ def list_today_cards():
 @main.route("/review")
 @main.route("/review/<card_id>")
 def review(card_id=None):
+    log('调用路由')
     log(f'card_id: {type(card_id)}')
     return memorize(card_id)
 
@@ -129,6 +137,7 @@ def memorize(card_id):
 
 @main.route("/txt_insert_card")
 def txt_insert_card():
+    log('调用路由')
     insert_from_txt()
     flash('插入成功.')
     return redirect(url_for('.index'))
@@ -136,6 +145,7 @@ def txt_insert_card():
 
 @main.route('/mark_known/<card_id>')
 def mark_known(card_id):
+    log('调用路由')
     log('观察变化: ')
     log(f"card_id: {card_id}")
     set_known(card_id)
@@ -149,4 +159,5 @@ def mark_known(card_id):
 
 @main.route("/test")
 def test():
+    log('调用路由')
     return render_template('test.html')

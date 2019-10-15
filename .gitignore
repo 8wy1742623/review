@@ -5,6 +5,7 @@ __pycache__/
 
 # ignore dir & file
 .vscode/
+.idea/
 desin_pic/
 test_review_application
 log.txt.log

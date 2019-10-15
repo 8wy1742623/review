@@ -1,32 +1,27 @@
-from flask import (
-    current_app,
-    g
-)
-from datetime import (
-    datetime,
-    timedelta
-)
+from flask import (current_app, g)
+from datetime import (datetime, timedelta)
 import sqlite3
 from utils import log, debug
 
 
-def connect_db():
-    rv = sqlite3.connect(
-        current_app.config['DATABASE'],
-        detect_types=sqlite3.PARSE_DECLTYPES,
-    )
-    rv.row_factory = sqlite3.Row
-    log('connect splite.db')
-    return rv
+# def connect_db():
+#     rv = sqlite3.connect(
+#         current_app.config['DATABASE'],
+#         detect_types=sqlite3.PARSE_DECLTYPES,
+#     )
+#     rv.row_factory = sqlite3.Row
+#     log('connect splite.db')
+#     return rv
 
 
-def get_db():
-    """Opens a new database connection if there is none yet for the
-    current application context.
-    """
-    if not hasattr(g, 'sqlite_db'):
-        g.sqlite_db = connect_db()
-    return g.sqlite_db
+# def get_db():
+#     """Opens a new database connection if there is none yet for the
+#     current application context.
+#     """
+#     log('db operation.')
+#     if not hasattr(g, 'sqlite_db'):
+#         g.sqlite_db = connect_db()
+#     return g.sqlite_db
 
 
 def close_db(e=None):
@@ -117,12 +112,137 @@ def review_days(review_date: str) -> {str}:
     ct_l = map(lambda d: substrac_days(rv, d), d_l)
     # 创建日期的 str 类型.
     ct_texts = map(lambda ct: tm_2_str(ct), ct_l)
+    # todo return map -> list, or not.
     return ct_texts
 
 
 def substrac_days(dt: datetime, days: int) -> datetime:
     return dt - timedelta(days)
 
+
+import logging
+from sqlalchemy import (
+    Column,
+    String,
+    Integer,
+    create_engine,
+    ForeignKey,
+    MetaData,
+    Table,
+    or_,
+    and_,
+)
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import (
+    sessionmaker,
+    relationship,
+)
+from sqlalchemy.sql.expression import text
+
+def init_db():
+    """使用 schema.sql 初始化db"""
+    log('初始化数据库...')
+    db = get_db()
+
+    with current_app.open_resource('data/schema.sql', mode='r') as f:
+        db.execute(text(f.read()))
+    db.commit()
+    log('初始化数据库成功.')
+
+
+def init_app(app):
+    # fn'close_db' register with the app
+    #
+    # close_db function in the application factory,
+    # so that it is called after each request.
+    app.teardown_appcontext(close_db)
+
+
+def connect_db():
+    logging.info('create database connection pool...')
+    # 连接
+    engine = create_engine('sqlite:///web8.sqlite', echo=False)
+
+    meta = MetaData()
+    meta.create_all(engine)
+
+    # 创建 DBSession 类型:
+    db_session = sessionmaker(bind=engine)
+    log(f'db_session 类型: {type(db_session)}')
+
+    return db_session
+
+
+def get_db():
+    """Opens a new database connection if there is none yet for the
+    current application context.
+    """
+    if not hasattr(g, 'db'):
+        sess = connect_db()
+        g.db = sess()
+    return g.db
+
+
+def close_db(e=None):
+    """Closes the database."""
+    db = g.pop('db', None)
+
+    if db is not None:
+        db.close()
+
+
+def select_(sql, args=dict(), one=False):
+    """执行一条语句，并关闭连接。
+
+    说明：该函数不包括 commit() 的执行，
+    所以 query 语句的任何操作，都不会改变数据库。
+    因此，这个函数仅设计为查询使用。
+
+    sql, args like:
+    user_table.select().where(user_table.c.id == 5)
+
+    "SELECT * FROM user WHERE id=:param",
+    {"param":5}
+    """
+    log(f'SELECT 参数: {sql}, {args}')
+    cur = get_db().execute(sql, args)
+    rv = cur.fetchall()
+    # cur.close()
+
+    # return:
+    if rv:
+        if one:
+            return rv[0]  # 返回找到的第一个
+        else:
+            return rv  # 返回所有找到的
+    else:
+        return None  # 没找到
+
+
+def execute(sql, args=dict()):
+    log(f'execute 参数: {sql}, {args}')
+    sess = get_db()
+    log(f'sess 类型: {type(sess)}')
+    cur = sess.execute(sql, args)
+    return postfix(cur)
+
+
+def postfix(cur):
+    rv = cur.fetchall()
+    sess.commit()
+    return rv
+
+def unpack(l):
+    r = []
+    for i in l:
+        if isinstance(i, list):
+            r = r + unpack(i)
+        else:
+            r.append(i)
+    return r
+
+def review_days(review_days_text: str) -> {str}:
+    pass
 
 def test():
     # Test tm_2_str()
@@ -134,7 +254,6 @@ def test():
 
     # Test today_text()
     log(today_text())
-
 
 
 if __name__ == '__main__':
